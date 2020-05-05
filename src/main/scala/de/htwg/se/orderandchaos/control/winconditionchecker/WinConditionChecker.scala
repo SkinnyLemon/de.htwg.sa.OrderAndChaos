@@ -31,8 +31,14 @@ private class WinConditionCheckerImpl extends WinConditionChecker {
       !winningLineExists(convertEmptyFields(grid, Cell.red))
 
   def checkForWinningLine(input: Vector[Cell]): Boolean = {
-    val line = input.mkString("")
-    line.contains(blueLine) || line.contains(redLine)
+    def checkForWinningLineOfColor(color: String): Boolean = {
+      input.foldLeft((0, 0))((data, cell) => data match {
+        case (max: Int, current: Int) =>
+          if (cell.cellType == color) (if (current >= max) current + 1 else max, current + 1)
+          else (max, 0)
+      })._1 >= WinConditionChecker.WINNINGSTREAK
+    }
+    checkForWinningLineOfColor(Cell.TYPE_BLUE) || checkForWinningLineOfColor(Cell.TYPE_RED)
   }
 
   def convertEmptyFields(grid: Grid, cell: Cell): Grid = grid.mapEachCell {
