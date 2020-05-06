@@ -46,8 +46,8 @@ class ControlImpl(startController: Controller = Controller.getNew,
 
   override def playBlue(x: Int, y: Int): Try[Unit] = play(x, y, Cell.TYPE_BLUE)
 
-  override def play(x: Int, y: Int, fieldType: String): Try[Unit] = currentController.play(x, y, fieldType) match {
-    case Success(newController) => futureMoves = Vector.empty
+  override def play(x: Int, y: Int, fieldType: String): Try[Unit] = currentController.play(x, y, fieldType).map(newController => {
+    futureMoves = Vector.empty
       pastMoves = currentController +: pastMoves
       val grid = newController.grid
       if (winConditionChecker.winningLineExists(grid)) {
@@ -60,9 +60,7 @@ class ControlImpl(startController: Controller = Controller.getNew,
         currentController = newController
         publish(new CellSet)
       }
-      Success()
-    case Failure(e) => Failure(e)
-  }
+  })
 
   //noinspection DuplicatedCode
   override def undo(): Try[Unit] = {

@@ -27,11 +27,7 @@ class CommandTranslator(control: Control) {
     if (values.length != 2) {
       Failure(new CommandParsingException("Both coordinates and the field type need to be set!"))
     } else {
-      val cellType = values(1)
-      buildCoordinates(values(0)) match {
-        case Success(coordinates) => control.play(coordinates(0), coordinates(1), cellType)
-        case Failure(e) => Failure(e)
-      }
+      buildCoordinates(values(0)).flatMap(coordinates => control.play(coordinates(0), coordinates(1), values(1)))
     } match {
       case Failure(e: CommandParsingException) => Failure(new CommandParsingException(s"${e.getMessage} - Usage: ${CommandTranslator.setInstruction}"))
       case Failure(_: InvalidCellTypeException) => Failure(new CommandParsingException(

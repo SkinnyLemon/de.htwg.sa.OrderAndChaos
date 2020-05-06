@@ -23,10 +23,7 @@ object Controller {
 private class StandardController(grid: Grid = Grid.empty, override val turn: String = "Order") extends Controller(grid, turn) {
   override def play(x: Int, y: Int, fieldType: String): Try[Controller] = {
     val nextTurn = if (turn == "Order") "Chaos" else "Order"
-    grid.set(x - 1, y - 1, fieldType) match {
-      case Success(newGrid) => Success(new StandardController(newGrid, nextTurn))
-      case Failure(e) => Failure(e)
-    }
+    grid.set(x - 1, y - 1, fieldType).map(newGrid => new StandardController(newGrid, nextTurn))
   }
 
   override def isOngoing: Boolean = true

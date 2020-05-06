@@ -45,10 +45,8 @@ private class GridImpl(cells: Vector[Vector[Cell]]) extends Grid {
 
   override def apply(x: Int, y: Int): Cell = cells(y)(x)
 
-  override def set(x: Int, y: Int, fieldType: String): Try[Grid] = cells(y)(x).setType(fieldType) match {
-    case Success(newCell) => Success(new GridImpl(cells.updated(y, cells(y).updated(x, newCell))))
-    case Failure(e) => Failure(e)
-  }
+  override def set(x: Int, y: Int, fieldType: String): Try[Grid] =
+    cells(y)(x).setType(fieldType).map(newCell => new GridImpl(cells.updated(y, cells(y).updated(x, newCell))))
 
   override def toString: String = makeString(_.toString)
 
@@ -102,23 +100,14 @@ private class GridImpl(cells: Vector[Vector[Cell]]) extends Grid {
   )
 
   private def getDiagonals(buildDiagonalX: Int => Try[Vector[Cell]], buildDiagonalY: Int => Try[Vector[Cell]]): Try[Vector[Vector[Cell]]] = {
-    getLinesOverVal(0, buildDiagonalX) match {
-      case Success(xDiagonals) => getLinesOverVal(1, buildDiagonalY) match {
-        case Success(yDiagonals) => Success(xDiagonals ++ yDiagonals)
-        case Failure(e) => Failure(e)
-      }
-      case Failure(e) => Failure(e)
-    }
+    getLinesOverVal(0, buildDiagonalX).flatMap(xDiagonals =>
+      getLinesOverVal(1, buildDiagonalY).map(yDiagonals => xDiagonals ++ yDiagonals))
   }
 
   private def getLinesOverVal(start: Int, method: Int => Try[Vector[Cell]]): Try[Vector[Vector[Cell]]] = {
-    @tailrec
     def getLinesOverValRec(value: Int, sum: Vector[Vector[Cell]] = Vector.empty): Try[Vector[Vector[Cell]]] =
       if (value < Grid.WIDTH) {
-        method(value) match {
-          case Success(diagonal) => getLinesOverValRec(value + 1, sum :+ diagonal)
-          case Failure(e) => Failure(e)
-        }
+        method(value).flatMap(diagonal => getLinesOverValRec(value + 1, sum :+ diagonal))
       } else {
         Success(sum)
       }
