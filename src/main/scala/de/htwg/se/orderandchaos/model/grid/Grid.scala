@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 trait Grid {
   def mapEachCell(f: Cell => Cell): Grid
 
-  def forEachCell(f: Cell => Unit): Unit
+  def forAll(f: Cell => Boolean): Boolean
 
   def exists(f: Cell => Boolean): Boolean
 
@@ -39,7 +39,7 @@ private class GridImpl(cells: Vector[Vector[Cell]]) extends Grid {
 
   override def mapEachCell(f: Cell => Cell): Grid = new GridImpl(cells.map(_.map(f)))
 
-  override def forEachCell(f: Cell => Unit): Unit = cells.foreach(_.foreach(f))
+  override def forAll(f: Cell => Boolean): Boolean = cells.forall(_.forall(f))
 
   override def exists(f: Cell => Boolean): Boolean = cells.exists(_.exists(f))
 

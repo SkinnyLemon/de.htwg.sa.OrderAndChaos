@@ -15,7 +15,7 @@ class GridSpec extends WordSpec with Matchers {
     "new" should {
       val grid = Grid.empty
       "be empty" in {
-        grid.forEachCell(field => field.cellType should be(Cell.TYPE_EMPTY))
+        grid.forAll(_.isEmpty) should be(true)
       }
       "have a nice string representation" in {
         val stringRepresentation = grid.toString
@@ -39,7 +39,7 @@ class GridSpec extends WordSpec with Matchers {
       case Success(cell) => cell
       case Failure(e) => fail(s"setType-function failed to execute\n$e")
     })
-    newGrid.forEachCell(field => field.cellType should be(newType))
+    newGrid.forAll(field => field.cellType == newType) should be(true)
     newGrid(4, 1).cellType should be(newType)
   }
   var buildingGrid: Grid = initialGrid
@@ -174,6 +174,6 @@ class GridSpec extends WordSpec with Matchers {
   }
   "Builds from a Sequence" in {
     val customGrid = Grid.fromSeq(Seq.fill(6)(Seq.fill(6)(new TestCell)))
-    customGrid.forEachCell(_.cellType should be(TestCell.STANDARD_TYPE))
+    customGrid.forAll(_.cellType == TestCell.STANDARD_TYPE) should be(true)
   }
 }
