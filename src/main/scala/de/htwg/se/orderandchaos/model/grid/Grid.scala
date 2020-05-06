@@ -20,9 +20,9 @@ trait Grid {
 
   def getColumn(x: Int): Try[Vector[Cell]]
 
-  def getUpDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]]
+  def getUpDiagonal: (Int, Int) => Try[Vector[Cell]]
 
-  def getDownDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]]
+  def getDownDiagonal: (Int, Int) => Try[Vector[Cell]]
 
   def getRows: Try[Vector[Vector[Cell]]]
 
@@ -60,19 +60,12 @@ private class GridImpl(cells: Vector[Vector[Cell]]) extends Grid {
 
   override def getColumn(x: Int): Try[Vector[Cell]] = Success(cells.map(row => row(x)))
 
-  override def getUpDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]] =
-    if (xStart > 0 && yStart > 0)
-      Failure(new IllegalArgumentException("parameters need to be on a starting axis"))
-    else
-      getDiagonal(xStart, yStart, 1)
+  override val getUpDiagonal: (Int, Int) => Try[Vector[Cell]] = getDiagonal(0, 1)
 
-  override def getDownDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]] =
-    if (xStart > 0 && yStart != Grid.WIDTH - 1)
-      Failure(new IllegalArgumentException("parameters need to be on a starting axis"))
-    else
-      getDiagonal(xStart, yStart, -1)
+  override val getDownDiagonal: (Int, Int) => Try[Vector[Cell]] = getDiagonal(Grid.WIDTH - 1, -1)
 
-  private final def getDiagonal(xStart: Int, yStart: Int, deltaY: Int): Try[Vector[Cell]] = {
+  private final def getDiagonal(yAxis: Int, deltaY: Int)(xStart: Int, yStart: Int): Try[Vector[Cell]] = {
+
     @tailrec
     def getDiagonalPart(x: Int, y: Int, fields: Vector[Cell]): Vector[Cell] = {
       if (x >= Grid.WIDTH || y >= Grid.WIDTH || x < 0 || y < 0) {
@@ -82,7 +75,9 @@ private class GridImpl(cells: Vector[Vector[Cell]]) extends Grid {
       }
     }
 
-    if (xStart < 0 || xStart >= Grid.WIDTH || yStart < 0 || yStart >= Grid.WIDTH)
+    if (xStart != 0 && yStart != yAxis)
+      Failure(new IllegalArgumentException("parameters need to be on a starting axis"))
+    else if (xStart < 0 || xStart >= Grid.WIDTH || yStart < 0 || yStart >= Grid.WIDTH)
       Failure(new IllegalArgumentException("parameters can't be negative or greater than / equal to the width"))
     else
       Success(getDiagonalPart(xStart, yStart, Vector.empty))

@@ -56,12 +56,12 @@ class TestGrid(var cell: Cell = Cell.blue, var vector: Vector[Cell] = Vector.emp
     Success(vector)
   }
 
-  override def getUpDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]] = {
+  override def getUpDiagonal: (Int, Int) => Try[Vector[Cell]] = (_, _) => {
     getUpDiagonalCalls += 1
     Success(vector)
   }
 
-  override def getDownDiagonal(xStart: Int, yStart: Int): Try[Vector[Cell]] = {
+  override def getDownDiagonal: (Int, Int) => Try[Vector[Cell]] = (_, _) => {
     getDownDiagonalCalls += 1
     Success(vector)
   }
