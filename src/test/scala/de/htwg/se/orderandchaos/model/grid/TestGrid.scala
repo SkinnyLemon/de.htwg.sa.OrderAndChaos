@@ -6,7 +6,7 @@ import scala.util.{Success, Try}
 
 class TestGrid(var cell: Cell = Cell.blue, var vector: Vector[Cell] = Vector.empty, vector2: Vector[Vector[Cell]] = Vector.empty) extends Grid {
   var mapCalls = 0
-  var forEachCalls = 0
+  var forAllCalls = 0
   var existsCalls = 0
   var applyCalls = 0
   var setCalls = 0
@@ -26,9 +26,9 @@ class TestGrid(var cell: Cell = Cell.blue, var vector: Vector[Cell] = Vector.emp
     this
   }
 
-  override def forEachCell(f: Cell => Unit): Unit = {
+  override def forAll(f: Cell => Boolean): Boolean = {
+    forAllCalls += 1
     f(cell)
-    forEachCalls += 1
   }
 
   override def exists(f: Cell => Boolean): Boolean = {
