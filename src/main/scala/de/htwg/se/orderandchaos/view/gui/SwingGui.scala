@@ -1,32 +1,35 @@
 package de.htwg.se.orderandchaos.view.gui
 
-import de.htwg.se.orderandchaos.control.{CellSet, Control, Win}
+import de.htwg.se.orderandchaos.control.game.{CellSet, Win}
+import de.htwg.se.orderandchaos.control.session.SessionHandler
 import de.htwg.se.orderandchaos.model.grid.Grid
 
 import scala.swing._
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
-class SwingGui(control: Control) extends Frame {
-  listenTo(control)
+class SwingGui(sessions: SessionHandler) extends Frame {
+  listenTo(sessions.eventProvider)
+  private var id = ""
+
   title = "Order and Chaos"
   menuBar = new MenuBar {
     contents += new Menu("Edit") {
       contents += new MenuItem(Action("Undo") {
-        control.undo()
+        sessions(id).control.undo()
       })
       contents += new MenuItem(Action("Redo") {
-        control.redo()
+        sessions(id).control.redo()
       })
       contents += new MenuItem(Action("Reset") {
-        control.reset()
+        sessions(id).control.reset()
       })
     }
     contents += new Menu("File") {
       contents += new MenuItem(Action("Save") {
-        control.save()
+        sessions(id).control.save()
       })
       contents += new MenuItem(Action("Load") {
-        control.load()
+        sessions(id).control.load()
       })
     }
   }
@@ -34,7 +37,8 @@ class SwingGui(control: Control) extends Frame {
   visible = true
   repaint()
 
-  def update(): BoxPanel = {
+  def update(): BoxPanel = Try({
+    val control = sessions(id).control
     val locked = !control.controller.isOngoing
     val grid = control.controller.grid
     val cells: Vector[CellPanel] =
@@ -49,12 +53,21 @@ class SwingGui(control: Control) extends Frame {
       contents += new Label(control.controller.header)
       contents += gridPanel
     }
+  }) match {
+    case Success(value) => value
+    case Failure(_) => new BoxPanel(Orientation.Vertical)
   }
 
   reactions += {
-    case _: CellSet => contents = update()
+    case ev: CellSet =>
+      if (ev.sessionId != id)
+        this.id = ev.sessionId
+      contents = update()
       repaint()
-    case _: Win => contents = update()
+    case ev: Win =>
+      if (ev.sessionId != id)
+        this.id = ev.sessionId
+      contents = update()
       repaint()
   }
 }

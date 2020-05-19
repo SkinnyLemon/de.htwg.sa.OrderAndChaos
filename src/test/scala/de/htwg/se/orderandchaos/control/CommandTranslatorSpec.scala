@@ -1,5 +1,6 @@
 package de.htwg.se.orderandchaos.control
 
+import de.htwg.se.orderandchaos.control.game.CommandTranslator
 import de.htwg.se.orderandchaos.model.cell.{Cell, TestCell}
 import de.htwg.se.orderandchaos.model.{CommandParsingException, InvalidCellTypeException}
 import de.htwg.se.orderandchaos.util.ExceptionChecker

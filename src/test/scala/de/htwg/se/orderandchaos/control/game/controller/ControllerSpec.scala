@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.control.controller
+package de.htwg.se.orderandchaos.control.game.controller
 
 import de.htwg.se.orderandchaos.model.MoveOnDecidedGameException
 import de.htwg.se.orderandchaos.model.cell.{Cell, TestCell}

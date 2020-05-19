@@ -1,9 +1,9 @@
-package de.htwg.se.orderandchaos.control.file.xml
+package de.htwg.se.orderandchaos.control.game.file.xml
 
 import java.io.{File, PrintWriter}
 
-import de.htwg.se.orderandchaos.control.controller.Controller
-import de.htwg.se.orderandchaos.control.file.FileManager
+import de.htwg.se.orderandchaos.control.game.controller.Controller
+import de.htwg.se.orderandchaos.control.game.file.FileManager
 
 import scala.xml.{Elem, PrettyPrinter, XML}
 

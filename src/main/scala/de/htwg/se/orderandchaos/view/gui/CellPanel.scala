@@ -1,6 +1,6 @@
 package de.htwg.se.orderandchaos.view.gui
 
-import de.htwg.se.orderandchaos.control.Control
+import de.htwg.se.orderandchaos.control.game.Control
 import de.htwg.se.orderandchaos.model.cell.Cell
 
 import scala.swing.event.{MouseClicked, MouseEntered, MouseExited, MouseMoved}

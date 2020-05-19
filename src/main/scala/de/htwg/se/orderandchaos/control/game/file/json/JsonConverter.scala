@@ -1,7 +1,7 @@
-package de.htwg.se.orderandchaos.control.file.json
+package de.htwg.se.orderandchaos.control.game.file.json
 
-import de.htwg.se.orderandchaos.control.controller.Controller
-import de.htwg.se.orderandchaos.control.file.FileManager
+import de.htwg.se.orderandchaos.control.game.controller.Controller
+import de.htwg.se.orderandchaos.control.game.file.FileManager
 import de.htwg.se.orderandchaos.model.JsonParsingException
 import de.htwg.se.orderandchaos.model.cell.Cell
 import de.htwg.se.orderandchaos.model.grid.Grid

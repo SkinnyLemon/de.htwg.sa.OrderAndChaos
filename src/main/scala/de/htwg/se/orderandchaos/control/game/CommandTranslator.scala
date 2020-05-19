@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.control
+package de.htwg.se.orderandchaos.control.game
 
 import de.htwg.se.orderandchaos.control.winconditionchecker.WinConditionChecker
 import de.htwg.se.orderandchaos.model.cell.Cell
@@ -32,7 +32,7 @@ class CommandTranslator(control: Control) {
       case Failure(e: CommandParsingException) => Failure(new CommandParsingException(s"${e.getMessage} - Usage: ${CommandTranslator.setInstruction}"))
       case Failure(_: InvalidCellTypeException) => Failure(new CommandParsingException(
         s"The field type was invalid! types: ${Cell.validSetTypes.mkString(", ")} - Usage: ${CommandTranslator.setInstruction}"))
-      case Failure(e) => Failure(e)
+      case e: Failure[_] => e
       case Success(_) => Success()
     }
   }

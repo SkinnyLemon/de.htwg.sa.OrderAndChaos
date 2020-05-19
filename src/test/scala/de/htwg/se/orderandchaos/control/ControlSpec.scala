@@ -1,6 +1,7 @@
 package de.htwg.se.orderandchaos.control
 
-import de.htwg.se.orderandchaos.control.controller.TestController
+import de.htwg.se.orderandchaos.control.game.{Control, ControlImpl}
+import de.htwg.se.orderandchaos.control.game.controller.TestController
 import de.htwg.se.orderandchaos.control.winconditionchecker.TestWinConditionChecker
 import de.htwg.se.orderandchaos.model.NoMoreMovesException
 import de.htwg.se.orderandchaos.model.cell.Cell
@@ -15,7 +16,7 @@ class ControlSpec extends WordSpec with Matchers {
     val startController = new TestController
     val winConditionChecker = new TestWinConditionChecker
     "play a red cell" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.playRed(0, 1)
       val newController = control.controller.asInstanceOf[TestController]
       newController.lastX should be(0)
@@ -24,7 +25,7 @@ class ControlSpec extends WordSpec with Matchers {
       newController.redCalls should be(1)
     }
     "play a blue cell" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.playBlue(2, 3)
       val newController = control.controller.asInstanceOf[TestController]
       newController.lastX should be(2)
@@ -33,7 +34,7 @@ class ControlSpec extends WordSpec with Matchers {
       newController.blueCalls should be(1)
     }
     "play a cell" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.play(2, 3, Cell.TYPE_EMPTY)
       val newController = control.controller.asInstanceOf[TestController]
       newController.lastX should be(2)
@@ -43,7 +44,7 @@ class ControlSpec extends WordSpec with Matchers {
       newController.blueCalls should be(0)
     }
     "undo a turn" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.play(2, 3, Cell.TYPE_EMPTY)
       control.play(4, 5, Cell.TYPE_BLUE)
       control.undo()
@@ -55,7 +56,7 @@ class ControlSpec extends WordSpec with Matchers {
       newController.blueCalls should be(0)
     }
     "redo a turn" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.play(2, 3, Cell.TYPE_EMPTY)
       control.play(4, 5, Cell.TYPE_BLUE)
       control.undo()
@@ -68,14 +69,14 @@ class ControlSpec extends WordSpec with Matchers {
       newController.blueCalls should be(1)
     }
     "limit undos" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       ExceptionChecker.checkTry[NoMoreMovesException](control.undo(), "Did too many undos")
       control.play(4, 5, Cell.TYPE_BLUE)
       control.undo()
       ExceptionChecker.checkTry[NoMoreMovesException](control.undo(), "Did too many undos")
     }
     "limit redos" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       ExceptionChecker.checkTry[NoMoreMovesException](control.redo(), "Did too many redos")
       control.play(4, 5, Cell.TYPE_BLUE)
       control.undo()
@@ -83,28 +84,28 @@ class ControlSpec extends WordSpec with Matchers {
       ExceptionChecker.checkTry[NoMoreMovesException](control.redo(), "Did too many redos")
     }
     "reset" in {
-      val control: Control = new ControlImpl(startController, winConditionChecker)
+      val control: Control = new ControlImpl("", startController, winConditionChecker)
       control.play(2, 3, Cell.TYPE_EMPTY)
       control.play(4, 5, Cell.TYPE_BLUE)
       control.reset()
       control.controller should be(startController)
     }
     "recognizes an order win" in {
-      val control: Control = new ControlImpl(startController, new TestWinConditionChecker(1))
+      val control: Control = new ControlImpl("", startController, new TestWinConditionChecker(1))
       control.play(2, 3, Cell.TYPE_EMPTY)
       control.controller.isOngoing should be(false)
     }
     "recognizes a chaos win" in {
-      val control: Control = new ControlImpl(startController, new TestWinConditionChecker(2))
+      val control: Control = new ControlImpl("", startController, new TestWinConditionChecker(2))
       control.play(2, 3, Cell.TYPE_EMPTY)
       control.controller.isOngoing should be(false)
     }
     "have a nice string representation" in {
-      val control: Control = new ControlImpl(startController, new TestWinConditionChecker(2))
+      val control: Control = new ControlImpl("", startController, new TestWinConditionChecker(2))
       control.toString should be(TestController.STRING_REPRESENTATION)
     }
     "make a custom string representation" in {
-      val control: Control = new ControlImpl(startController, new TestWinConditionChecker(2))
+      val control: Control = new ControlImpl("", startController, new TestWinConditionChecker(2))
       control.makeString(_ => "") should be("\n")
       control.controller.asInstanceOf[TestController].headerCalls should be(1)
     }

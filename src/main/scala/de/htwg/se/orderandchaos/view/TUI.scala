@@ -1,7 +1,8 @@
 package de.htwg.se.orderandchaos.view
 
 import com.google.inject.Inject
-import de.htwg.se.orderandchaos.control.{CellSet, CommandTranslator, Control, Win}
+import de.htwg.se.orderandchaos.control.game.{CellSet, CommandTranslator, Control, Win}
+import de.htwg.se.orderandchaos.control.session.SessionHandler
 import de.htwg.se.orderandchaos.model.{CommandParsingException, OacException}
 
 import scala.annotation.tailrec
@@ -10,12 +11,12 @@ import scala.swing.Reactor
 import scala.util.{Failure, Success, Try}
 
 //noinspection ScalaStyle
-final class TUI(@Inject control: Control) extends Reactor {
-  listenTo(control)
-  val interpreter = new CommandTranslator(control)
+final class TUI(@Inject sessions: SessionHandler) extends Reactor {
+  listenTo(sessions.eventProvider)
   var stop = false
+  private var id = sessions.startSession()
   println("Welcome to Order and Chaos! Type \"help\" to display the available commands.")
-  println(control.toString)
+  println(sessions(id).control.toString)
 
   @tailrec
   def interpretLines(): Unit = {
@@ -34,7 +35,9 @@ final class TUI(@Inject control: Control) extends Reactor {
           println("Game ended!")
           return
         }
-        Try(command match {
+        val interpreter = sessions(id).commandTranslator
+        val control = sessions(id).control
+        (command match {
           case set if set startsWith "set " => interpreter.interpretSet(set.substring(4))
           case "undo" => control.undo()
           case "redo" => control.redo()
@@ -42,12 +45,21 @@ final class TUI(@Inject control: Control) extends Reactor {
           case "save" => control.save()
           case "load" => control.load()
           case "print" => println(interpreter.makeColorString)
+          case "new" =>
+            this.id = sessions.startSession()
+            println(this.id + "\n" + sessions(id).commandTranslator.makeColorString)
+          case switch if switch startsWith "switch " => Try(sessions(switch.substring(7))) match {
+            case Success(_) =>
+              this.id = switch.substring(7)
+              println(this.id + "\n" + sessions(id).commandTranslator.makeColorString)
+            case Failure(_) => println("Can't find game with that id")
+          }
           case _ => throw new CommandParsingException("Unrecognized command!")
         }) match {
           case Failure(e: CommandParsingException) => println(s"Error parsing command: ${e.getMessage}")
           case Failure(e: OacException) => println(s"Error executing command: ${e.getMessage}")
           case Failure(e) => throw e
-          case Success(_) =>
+          case _ =>
         }
     }
     if (stop) {
@@ -58,12 +70,12 @@ final class TUI(@Inject control: Control) extends Reactor {
   }
 
   reactions += {
-    case _: CellSet => println(interpreter.makeColorString)
+    case ev: CellSet => println(ev.sessionId + "\n" + sessions(id).commandTranslator.makeColorString)
     case win: Win => handleWin(win)
   }
 
   def handleWin(win: Win): Unit = {
     println(s"Player ${win.player} won the game!")
-    println(interpreter.makeColorString)
+    println(win.sessionId + "\n" + sessions(id).commandTranslator.makeColorString)
   }
 }

@@ -1,6 +1,6 @@
-package de.htwg.se.orderandchaos.control.file
+package de.htwg.se.orderandchaos.control.game.file
 
-import de.htwg.se.orderandchaos.control.controller.Controller
+import de.htwg.se.orderandchaos.control.game.controller.Controller
 
 trait FileManager {
   def saveToFile(controller: Controller): Unit

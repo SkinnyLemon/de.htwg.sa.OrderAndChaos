@@ -1,9 +1,9 @@
-package de.htwg.se.orderandchaos.control
+package de.htwg.se.orderandchaos.control.game
 
 import com.google.inject.Inject
-import de.htwg.se.orderandchaos.control.controller.Controller
-import de.htwg.se.orderandchaos.control.file.FileManager
-import de.htwg.se.orderandchaos.control.file.json.JsonFileManager
+import de.htwg.se.orderandchaos.control.game.controller.Controller
+import de.htwg.se.orderandchaos.control.game.file.FileManager
+import de.htwg.se.orderandchaos.control.game.file.json.JsonFileManager
 import de.htwg.se.orderandchaos.control.winconditionchecker.WinConditionChecker
 import de.htwg.se.orderandchaos.model.NoMoreMovesException
 import de.htwg.se.orderandchaos.model.cell.Cell
@@ -33,9 +33,18 @@ trait Control extends Publisher {
   def makeString(cellToString: Cell => String): String
 }
 
-class ControlImpl(startController: Controller = Controller.getNew,
-                  winConditionChecker: WinConditionChecker = WinConditionChecker.get,
-                  @Inject fileManager: FileManager = new JsonFileManager) extends Control {
+object Control {
+  def getControlFactory: ControlFactory = new ControlFactory
+}
+
+class ControlFactory () {
+  def getNewControl(sessionId: String): Control = new ControlImpl(sessionId)
+}
+
+class ControlImpl(sessionId: String,
+                          startController: Controller = Controller.getNew,
+                          winConditionChecker: WinConditionChecker = WinConditionChecker.get,
+                          @Inject fileManager: FileManager = new JsonFileManager) extends Control {
   private var currentController: Controller = startController
   private var pastMoves: Vector[Controller] = Vector.empty
   private var futureMoves: Vector[Controller] = Vector.empty
@@ -48,18 +57,18 @@ class ControlImpl(startController: Controller = Controller.getNew,
 
   override def play(x: Int, y: Int, fieldType: String): Try[Unit] = currentController.play(x, y, fieldType).map(newController => {
     futureMoves = Vector.empty
-      pastMoves = currentController +: pastMoves
-      val grid = newController.grid
-      if (winConditionChecker.winningLineExists(grid)) {
-        currentController = Controller.getFinished(grid, "Order")
-        publish(new Win("Order"))
-      } else if (winConditionChecker.noWinningLinePossible(grid)) {
-        currentController = Controller.getFinished(grid, "Chaos")
-        publish(new Win("Chaos"))
-      } else {
-        currentController = newController
-        publish(new CellSet)
-      }
+    pastMoves = currentController +: pastMoves
+    val grid = newController.grid
+    if (winConditionChecker.winningLineExists(grid)) {
+      currentController = Controller.getFinished(grid, "Order")
+      publish(new Win(sessionId, "Order"))
+    } else if (winConditionChecker.noWinningLinePossible(grid)) {
+      currentController = Controller.getFinished(grid, "Chaos")
+      publish(new Win(sessionId, "Chaos"))
+    } else {
+      currentController = newController
+      publish(new CellSet(sessionId))
+    }
   })
 
   //noinspection DuplicatedCode
@@ -68,7 +77,7 @@ class ControlImpl(startController: Controller = Controller.getNew,
     futureMoves = currentController +: futureMoves
     currentController = pastMoves.head
     pastMoves = pastMoves.tail
-    publish(new CellSet)
+    publish(new CellSet(sessionId))
     Success()
   }
 
@@ -78,14 +87,14 @@ class ControlImpl(startController: Controller = Controller.getNew,
     pastMoves = currentController +: pastMoves
     currentController = futureMoves.head
     futureMoves = futureMoves.tail
-    publish(new CellSet)
+    publish(new CellSet(sessionId))
     Success()
   }
 
   override def reset(): Try[Unit] = {
     pastMoves = currentController +: pastMoves
     currentController = startController
-    publish(new CellSet)
+    publish(new CellSet(sessionId))
     Success()
   }
 
@@ -95,8 +104,8 @@ class ControlImpl(startController: Controller = Controller.getNew,
     val controller = fileManager.loadFromFile
     pastMoves = currentController +: pastMoves
     currentController = controller
-    if (controller.isOngoing) publish(new CellSet)
-    else publish(new Win(controller.turn))
+    if (controller.isOngoing) publish(new CellSet(sessionId))
+    else publish(new Win(sessionId, controller.turn))
   }
 
   override def toString: String = currentController.toString

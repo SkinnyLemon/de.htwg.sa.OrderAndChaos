@@ -1,6 +1,7 @@
 package de.htwg.se.orderandchaos.control
 
-import de.htwg.se.orderandchaos.control.controller.{Controller, TestController}
+import de.htwg.se.orderandchaos.control.game.Control
+import de.htwg.se.orderandchaos.control.game.controller.{Controller, TestController}
 import de.htwg.se.orderandchaos.model.cell.Cell
 
 import scala.util.{Failure, Success, Try}

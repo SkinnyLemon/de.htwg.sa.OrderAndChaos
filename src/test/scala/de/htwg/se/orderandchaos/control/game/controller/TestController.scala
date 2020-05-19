@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.control.controller
+package de.htwg.se.orderandchaos.control.game.controller
 
 import de.htwg.se.orderandchaos.model.cell.Cell
 import de.htwg.se.orderandchaos.model.grid.{Grid, TestGrid}
