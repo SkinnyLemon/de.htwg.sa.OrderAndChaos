@@ -1,9 +1,9 @@
 package de.htwg.se.orderandchaos
 
 import com.google.inject.AbstractModule
-import de.htwg.se.orderandchaos.control.game.file.FileManager
-import de.htwg.se.orderandchaos.control.game.file.xml.XmlFileManager
-import de.htwg.se.orderandchaos.control.session.SessionHandler
+import de.htwg.se.orderandchaos.game.control.file.FileManager
+import de.htwg.se.orderandchaos.game.control.file.xml.XmlFileManager
+import de.htwg.se.orderandchaos.session.SessionHandler
 import net.codingwell.scalaguice.ScalaModule
 
 class OacModule extends AbstractModule with ScalaModule {

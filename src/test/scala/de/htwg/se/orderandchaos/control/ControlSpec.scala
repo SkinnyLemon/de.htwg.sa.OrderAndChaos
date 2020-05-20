@@ -1,11 +1,11 @@
 package de.htwg.se.orderandchaos.control
 
-import de.htwg.se.orderandchaos.control.game.{Control, ControlImpl}
-import de.htwg.se.orderandchaos.control.game.controller.TestController
-import de.htwg.se.orderandchaos.control.winconditionchecker.TestWinConditionChecker
-import de.htwg.se.orderandchaos.model.NoMoreMovesException
-import de.htwg.se.orderandchaos.model.cell.Cell
+import de.htwg.se.orderandchaos.game.control.controller.TestController
+import de.htwg.se.orderandchaos.game.control.{Control, ControlImpl}
+import de.htwg.se.orderandchaos.game.model.NoMoreMovesException
+import de.htwg.se.orderandchaos.game.model.cell.Cell
 import de.htwg.se.orderandchaos.util.ExceptionChecker
+import de.htwg.se.orderandchaos.winconditionchecker.TestWinConditionChecker
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}

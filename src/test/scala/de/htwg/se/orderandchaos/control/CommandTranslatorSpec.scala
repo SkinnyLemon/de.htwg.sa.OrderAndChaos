@@ -1,9 +1,9 @@
 package de.htwg.se.orderandchaos.control
 
-import de.htwg.se.orderandchaos.control.game.CommandTranslator
-import de.htwg.se.orderandchaos.model.cell.{Cell, TestCell}
-import de.htwg.se.orderandchaos.model.{CommandParsingException, InvalidCellTypeException}
+import de.htwg.se.orderandchaos.game.model.cell.{Cell, TestCell}
+import de.htwg.se.orderandchaos.game.model.{CommandParsingException, InvalidCellTypeException}
 import de.htwg.se.orderandchaos.util.ExceptionChecker
+import de.htwg.se.orderandchaos.view.tui.CommandTranslator
 import org.junit.runner.RunWith
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.junit.JUnitRunner

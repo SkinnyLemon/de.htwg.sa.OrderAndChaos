@@ -1,9 +1,9 @@
 package de.htwg.se.orderandchaos.view.gui
 
-import de.htwg.se.orderandchaos.control.game.Control
-import de.htwg.se.orderandchaos.model.cell.Cell
+import de.htwg.se.orderandchaos.game.control.Control
+import de.htwg.se.orderandchaos.game.model.cell.Cell
 
-import scala.swing.event.{MouseClicked, MouseEntered, MouseExited, MouseMoved}
+import scala.swing.event.{MouseClicked, MouseEntered, MouseExited}
 import scala.swing.{BoxPanel, Color, Dimension, Orientation, Swing}
 
 class CellPanel(x: Int, y: Int, control: Control, isLocked: Boolean) extends BoxPanel(Orientation.Horizontal) {

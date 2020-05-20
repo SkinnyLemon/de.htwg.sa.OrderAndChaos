@@ -1,8 +1,8 @@
 package de.htwg.se.orderandchaos.view.gui
 
-import de.htwg.se.orderandchaos.control.game.{CellSet, Win}
-import de.htwg.se.orderandchaos.control.session.SessionHandler
-import de.htwg.se.orderandchaos.model.grid.Grid
+import de.htwg.se.orderandchaos.game.control.{CellSet, Win}
+import de.htwg.se.orderandchaos.session.SessionHandler
+import de.htwg.se.orderandchaos.game.model.grid.Grid
 
 import scala.swing._
 import scala.util.{Failure, Success, Try}
@@ -15,21 +15,21 @@ class SwingGui(sessions: SessionHandler) extends Frame {
   menuBar = new MenuBar {
     contents += new Menu("Edit") {
       contents += new MenuItem(Action("Undo") {
-        sessions(id).control.undo()
+        sessions(id).undo()
       })
       contents += new MenuItem(Action("Redo") {
-        sessions(id).control.redo()
+        sessions(id).redo()
       })
       contents += new MenuItem(Action("Reset") {
-        sessions(id).control.reset()
+        sessions(id).reset()
       })
     }
     contents += new Menu("File") {
       contents += new MenuItem(Action("Save") {
-        sessions(id).control.save()
+        sessions(id).save()
       })
       contents += new MenuItem(Action("Load") {
-        sessions(id).control.load()
+        sessions(id).load()
       })
     }
   }
@@ -38,9 +38,8 @@ class SwingGui(sessions: SessionHandler) extends Frame {
   repaint()
 
   def update(): BoxPanel = Try({
-    val control = sessions(id).control
+    val control = sessions(id)
     val locked = !control.controller.isOngoing
-    val grid = control.controller.grid
     val cells: Vector[CellPanel] =
       (for (y <- Grid.WIDTH - 1 to 0 by -1; x <- 0 until Grid.WIDTH)
         yield new CellPanel(x, y, control, locked))

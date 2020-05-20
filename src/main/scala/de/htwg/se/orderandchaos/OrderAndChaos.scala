@@ -1,9 +1,9 @@
 package de.htwg.se.orderandchaos
 
 import com.google.inject.{Guice, Injector}
-import de.htwg.se.orderandchaos.control.session.SessionHandler
-import de.htwg.se.orderandchaos.view.TUI
+import de.htwg.se.orderandchaos.session.SessionHandler
 import de.htwg.se.orderandchaos.view.gui.SwingGui
+import de.htwg.se.orderandchaos.view.tui.TUI
 
 object OrderAndChaos {
   val injector: Injector = Guice.createInjector(new OacModule)
