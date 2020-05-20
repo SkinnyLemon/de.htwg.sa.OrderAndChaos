@@ -3,7 +3,7 @@ package de.htwg.se.orderandchaos.session
 import java.util.UUID
 
 import de.htwg.se.orderandchaos.game.control.Control
-import de.htwg.se.orderandchaos.view.tui.CommandTranslator
+import de.htwg.se.orderandchaos.tui.CommandTranslator
 
 import scala.collection.mutable
 import scala.swing.{Publisher, Reactor}

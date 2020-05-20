@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.view.tui
+package de.htwg.se.orderandchaos.tui
 
 import de.htwg.se.orderandchaos.game.control.Control
 import de.htwg.se.orderandchaos.game.model.cell.Cell

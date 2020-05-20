@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.view.tui
+package de.htwg.se.orderandchaos.tui
 
 import com.google.inject.Inject
 import de.htwg.se.orderandchaos.game.control.{CellSet, Win}

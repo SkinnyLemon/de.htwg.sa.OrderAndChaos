@@ -1,4 +1,4 @@
-package de.htwg.se.orderandchaos.view.gui
+package de.htwg.se.orderandchaos.gui
 
 import de.htwg.se.orderandchaos.game.control.{CellSet, Win}
 import de.htwg.se.orderandchaos.session.SessionHandler
