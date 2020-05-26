@@ -3,7 +3,7 @@ import sbt.Keys.libraryDependencies
 name          := "de.htwg.sa.orderandchaos"
 organization  := "de.htwg.sa"
 version       := "0.0.1"
-scalaVersion  := "2.13.2"
+scalaVersion  := "2.12.4"
 
 val akkaVersion = "2.5.26"
 val akkaHttpVersion = "10.1.11"
@@ -18,18 +18,31 @@ val commonDependencies = Seq(
   "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6",
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
 )
 
 lazy val global = project
   .in(file("."))
   .aggregate(
-    UserInterfaceModule,
+    OacUi
   )
 
-lazy val UserInterfaceModule = project.settings(
-  name :=  "UserInterfaceModule",
+lazy val OacUi = project.settings(
+  name :=  "OacUi",
+  libraryDependencies ++= commonDependencies
+).dependsOn(OacSession, OacData)
+
+lazy val OacSession = project.settings(
+  name := "OacSession",
+  libraryDependencies ++= commonDependencies
+).dependsOn(OacWinChecker, OacData)
+
+lazy val OacWinChecker = project.settings(
+  name := "OacWinChecker",
+  libraryDependencies ++= commonDependencies
+).dependsOn(OacData)
+
+lazy val OacData = project.settings(
+  name := "OacData",
   libraryDependencies ++= commonDependencies
 )
-
-
