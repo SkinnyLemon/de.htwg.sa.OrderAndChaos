@@ -40,8 +40,8 @@ class WinCheckerHttp {
     }
   )
 
-  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "localhost", 8086)
-  println("http://localhost:8086/wincheck online")
+  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "winchecker", 8086)
+  println("http://winchecker:8086/wincheck online")
 
   def shutdownWebServer(): Unit = {
     bindingFuture

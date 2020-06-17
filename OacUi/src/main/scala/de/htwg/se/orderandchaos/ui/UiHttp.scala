@@ -79,8 +79,8 @@ class UiHttp extends GameController {
     }
   )
 
-  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "localhost", 8084)
-  println("http://localhost:8084/data online")
+  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "ui", 8084)
+  println("http://ui:8084/ui online")
 
   def shutdownWebServer(): Unit = {
     bindingFuture
@@ -89,26 +89,26 @@ class UiHttp extends GameController {
   }
 
   override def startInstance(): Future[String] = {
-    send("http://localhost:8085/data/new")
+    send("http://data:8085/data/new")
   }
 
   override def stopInstance(id: String): Future[Unit] = {
-    send("http://localhost:8085/data/end", id)
+    send("http://data:8085/data/end", id)
       .map(_ => Unit)
   }
 
   override def saveGame(id: String): Future[Unit] = {
-    send("http://localhost:8085/data/save", id)
+    send("http://data:8085/data/save", id)
       .map(_ => Unit)
   }
 
   override def loadGame(id: String): Future[Unit] = {
-    send("http://localhost:8085/data/load", id)
+    send("http://data:8085/data/load", id)
       .map(_ => Unit)
   }
 
   override def resetGame(id: String): Future[Unit] = {
-    send("http://localhost:8085/data/reset", id)
+    send("http://data:8085/data/reset", id)
       .map(_ => Unit)
   }
 
@@ -120,7 +120,7 @@ class UiHttp extends GameController {
       "color" -> color
     )
     val toSend = Json.stringify(jsValue)
-    send("http://localhost:8085/data/play", toSend, HttpMethods.PUT)
+    send("http://data:8085/data/play", toSend, HttpMethods.PUT)
       .map(_ => Unit)
   }
 

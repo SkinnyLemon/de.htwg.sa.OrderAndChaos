@@ -1,10 +1,7 @@
 package de.htwg.se.orderandchaos.winconditionchecker
 
-import de.htwg.se.orderandchaos.data.model.cell.Cell
-import de.htwg.se.orderandchaos.data.model.grid.Grid
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
 
 trait WinConditionChecker {
   def orderWon: Boolean
@@ -13,8 +10,9 @@ trait WinConditionChecker {
 }
 
 private class WinConditionCheckerImpl(values: Vector[Vector[String]]) extends WinConditionChecker {
-  private val blueLine = Cell.TYPE_BLUE * WinConditionChecker.WINNINGSTREAK
-  private val redLine = Cell.TYPE_RED * WinConditionChecker.WINNINGSTREAK
+  private val blueLine = "B" * WinConditionChecker.WINNINGSTREAK
+  private val redLine = "R" * WinConditionChecker.WINNINGSTREAK
+  private val width = 6
 
   def orderWon: Boolean = winningLineExists(values)
 
@@ -48,7 +46,7 @@ private class WinConditionCheckerImpl(values: Vector[Vector[String]]) extends Wi
     y => getUpDiagonal(rows, 0, y))
 
   private def downDiagonals(rows: Vector[Vector[String]]): Vector[Vector[String]] = getDiagonals(
-    x => getDownDiagonal(rows, x, Grid.WIDTH - 1),
+    x => getDownDiagonal(rows, x, width - 1),
     y => getDownDiagonal(rows, 0, y)
   )
 
@@ -60,7 +58,7 @@ private class WinConditionCheckerImpl(values: Vector[Vector[String]]) extends Wi
   private def getLinesOverVal(start: Int, method: Int => Vector[String]): Vector[Vector[String]] = {
     @tailrec
     def getLinesOverValRec(value: Int, sum: Vector[Vector[String]] = Vector.empty): Vector[Vector[String]] =
-      if (value < Grid.WIDTH) {
+      if (value < width) {
         val diagonal = method(value)
         getLinesOverValRec(value + 1, sum :+ diagonal)
       } else {
@@ -79,7 +77,7 @@ private class WinConditionCheckerImpl(values: Vector[Vector[String]]) extends Wi
   private def getDiagonal(rows: Vector[Vector[String]], xStart: Int, yStart: Int, deltaY: Int): Vector[String] = {
     @tailrec
     def getDiagonalPart(x: Int, y: Int, fields: Vector[String]): Vector[String] = {
-      if (x >= Grid.WIDTH || y >= Grid.WIDTH || x < 0 || y < 0) {
+      if (x >= width || y >= width || x < 0 || y < 0) {
         fields
       } else {
         getDiagonalPart(x + 1, y + deltaY, fields :+ rows(x)(y))

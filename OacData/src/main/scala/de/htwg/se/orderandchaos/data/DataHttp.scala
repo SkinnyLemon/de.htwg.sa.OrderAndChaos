@@ -119,8 +119,8 @@ class DataHttp extends WinChecker with GridUpdater {
     }
   }
 
-  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "localhost", 8085)
-  println("http://localhost:8085/data online")
+  val bindingFuture: Future[Http.ServerBinding] = Http().bindAndHandle(route, "data", 8085)
+  println("http://data:8085/data online")
 
   def shutdownWebServer(): Unit = {
     bindingFuture
@@ -129,20 +129,20 @@ class DataHttp extends WinChecker with GridUpdater {
   }
 
   override def determineWinner(grid: Grid): Future[Int] = {
-    send(convertGridToJsonArray(grid), "http://localhost:8086/wincheck")
+    send(convertGridToJsonArray(grid), "http://winchecker:8086/wincheck")
       .map(_.toInt)
   }
 
   override def updateBoard(id: String, controller: Controller): Unit = {
     val jsValue = convertGridToJsonArray(controller.grid)
     val toSend = Json.obj("id" -> id, "data" -> jsValue)
-    send(toSend, "http://localhost:8084/ui/update")
+    send(toSend, "http://ui:8084/ui/update")
   }
 
   override def announceWin(id: String, controller: Controller, winner: String): Unit = {
     val jsValue = convertGridToJsonArray(controller.grid)
     val toSend = Json.obj("id" -> id, "data" -> jsValue, "winner" -> winner)
-    send(toSend, "http://localhost:8084/ui/win")
+    send(toSend, "http://ui:8084/ui/win")
   }
 
   private def send(json: JsValue, uri: String): Future[String] = {

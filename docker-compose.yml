@@ -1,0 +1,19 @@
+version: "3"
+services:
+  ui:
+    container_name: "ui"
+    image: oac-ui:latest
+    stdin_open: true
+    tty: true
+    links:
+      - data
+  data:
+    container_name: "data"
+    image: oac-data:latest
+    stdin_open: true
+    links:
+      - winchecker
+  winchecker:
+    container_name: "winchecker"
+    image: oac-winchecker:latest
+    stdin_open: true

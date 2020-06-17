@@ -1,9 +1,9 @@
 import sbt.Keys.libraryDependencies
 
-name          := "de.htwg.sa.orderandchaos"
-organization  := "de.htwg.sa"
-version       := "0.0.1"
-scalaVersion  := "2.12.4"
+ThisBuild / name := "de.htwg.sa.orderandchaos"
+ThisBuild / organization := "de.htwg.sa"
+ThisBuild / version := "0.0.1"
+ThisBuild / scalaVersion := "2.12.4"
 
 val akkaVersion = "2.5.26"
 val akkaHttpVersion = "10.1.11"
@@ -24,25 +24,64 @@ val commonDependencies = Seq(
 lazy val global = project
   .in(file("."))
   .aggregate(
-    OacUi
+    OacWinChecker,
+    OacUi,
+    OacData
   )
 
 lazy val OacUi = project.settings(
-  name :=  "OacUi",
-  libraryDependencies ++= commonDependencies
-).dependsOn(OacSession, OacData)
-
-lazy val OacSession = project.settings(
-  name := "OacSession",
-  libraryDependencies ++= commonDependencies
-).dependsOn(OacWinChecker, OacData)
-
-lazy val OacWinChecker = project.settings(
-  name := "OacWinChecker",
-  libraryDependencies ++= commonDependencies
-).dependsOn(OacData)
+  name := "OacUi",
+  libraryDependencies ++= commonDependencies,
+  test in assembly := {},
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
+    case "application.conf" => MergeStrategy.concat
+    case "module-info.class" => MergeStrategy.concat
+    case "CHANGELOG.adoc" => MergeStrategy.concat
+    case "unwanted.txt" => MergeStrategy.discard
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  },
+  assemblyJarName in assembly := "OacUi.jar",
+  mainClass in assembly := Some("de.htwg.se.orderandchaos.ui.UiModule")
+)
 
 lazy val OacData = project.settings(
   name := "OacData",
-  libraryDependencies ++= commonDependencies
+  libraryDependencies ++= commonDependencies,
+  test in assembly := {},
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
+    case "application.conf" => MergeStrategy.concat
+    case "module-info.class" => MergeStrategy.concat
+    case "CHANGELOG.adoc" => MergeStrategy.concat
+    case "unwanted.txt" => MergeStrategy.discard
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  },
+  assemblyJarName in assembly := "OacData.jar",
+  mainClass in assembly := Some("de.htwg.se.orderandchaos.data.DataModule")
+)
+
+lazy val OacWinChecker = project.settings(
+  name := "OacWinChecker",
+  libraryDependencies ++= commonDependencies,
+  test in assembly := {},
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
+    case "application.conf" => MergeStrategy.concat
+    case "module-info.class" => MergeStrategy.concat
+    case "CHANGELOG.adoc" => MergeStrategy.concat
+    case "unwanted.txt" => MergeStrategy.discard
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  },
+  assemblyJarName in assembly := "OacWinChecker.jar",
+  mainClass in assembly := Some("de.htwg.se.orderandchaos.winconditionchecker.WinCheckerModule")
 )
