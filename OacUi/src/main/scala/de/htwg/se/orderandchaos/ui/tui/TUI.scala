@@ -1,24 +1,21 @@
 package de.htwg.se.orderandchaos.ui.tui
 
-import com.google.inject.Inject
-import de.htwg.se.orderandchaos.data.control.{CellSet, Win}
-import de.htwg.se.orderandchaos.data.model.{CommandParsingException, OacException}
-import de.htwg.se.orderandchaos.session.SessionHandler
+import de.htwg.se.orderandchaos.ui.GameController
+import de.htwg.se.orderandchaos.ui.util.{CellSet, CommandParsingException, OacException, Win}
 
 import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 import scala.swing.Reactor
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
 
 //noinspection ScalaStyle
-final class TUI(@Inject sessions: SessionHandler) extends Reactor {
-  listenTo(sessions.eventProvider)
+final class TUI(controller: GameController) extends Reactor {
+  listenTo(controller)
+  controller.startInstance()
   var stop = false
-  private var id = sessions.startSession()
-  private var control = sessions(id)
-  private var interpreter = new CommandTranslator(control)
+  private var id: String = ""
+  private val interpreter = new CommandTranslator(controller)
   println("Welcome to Order and Chaos! Type \"help\" to display the available commands.")
-  println(control.toString)
 
   @tailrec
   def interpretLines(): Unit = {
@@ -38,22 +35,21 @@ final class TUI(@Inject sessions: SessionHandler) extends Reactor {
           return
         }
         (command match {
-          case set if set startsWith "set " => interpreter.interpretSet(set.substring(4))
-          case "undo" => control.undo()
-          case "redo" => control.redo()
-          case "reset" => control.reset()
-          case "save" => control.save()
-          case "load" => control.load()
-          case "print" => println(interpreter.makeColorString)
+          case set if set startsWith "set " => interpreter.interpretSet(set.substring(4), id)
+          //          case "undo" => controller.undo()
+          //          case "redo" => controller.redo()
+          case "reset" => controller.resetGame(id)
+          case "save" => controller.saveGame(id)
+          case "load" => controller.loadGame(id)
+          //          case "print" => println(interpreter.makeColorString)
           case "new" =>
-            changeSession(sessions.startSession())
-            println(this.id + "\n" + interpreter.makeColorString)
-          case switch if switch startsWith "switch " => Try(sessions(switch.substring(7))) match {
-            case Success(_) =>
-              changeSession(switch.substring(7))
-              println(this.id + "\n" + interpreter.makeColorString)
-            case Failure(_) => println("Can't find game with that id")
-          }
+            controller.startInstance()
+          //          case switch if switch startsWith "switch " => Try(sessions(switch.substring(7))) match {
+          //            case Success(_) =>
+          //              changeSession(switch.substring(7))
+          //              println(this.id + "\n" + interpreter.makeColorString)
+          //            case Failure(_) => println("Can't find game with that id")
+          //          }
           case _ => Failure(new CommandParsingException("Unrecognized command!"))
         }) match {
           case Failure(e: CommandParsingException) => println(s"Error parsing command: ${e.getMessage}")
@@ -72,15 +68,18 @@ final class TUI(@Inject sessions: SessionHandler) extends Reactor {
   reactions += {
     case ev: CellSet =>
       changeSession(ev.sessionId)
-      println(id + "\n" + interpreter.makeColorString)
+      printGame(id, ev.rows)
     case win: Win =>
-      println(s"Player ${win.player} won the game!")
-      println(id + "\n" + interpreter.makeColorString)
+      println(s"Player ${win.winner} won the game!")
+      printGame(id, win.rows)
+  }
+
+  private def printGame(id: String, rows: Array[Array[String]]): Unit = {
+    val stringRepresentation = rows.map(_.map(interpreter.colorCell).mkString(" ")).mkString("\n")
+    println(s"$id\n$stringRepresentation")
   }
 
   private def changeSession(newId: String): Unit = {
     id = newId
-    control = sessions(newId)
-    interpreter = new CommandTranslator(control)
   }
 }

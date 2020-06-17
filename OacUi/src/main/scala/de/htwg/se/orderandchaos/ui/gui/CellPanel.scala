@@ -1,26 +1,22 @@
 package de.htwg.se.orderandchaos.ui.gui
 
-import de.htwg.se.orderandchaos.data.control.Control
-import de.htwg.se.orderandchaos.data.model.cell.Cell
-
 import scala.swing.event.{MouseClicked, MouseEntered, MouseExited}
 import scala.swing.{BoxPanel, Color, Dimension, Orientation, Swing}
 
-class CellPanel(x: Int, y: Int, control: Control, isLocked: Boolean) extends BoxPanel(Orientation.Horizontal) {
-  val gameCell: Cell = control.controller.grid(x, y)
+class CellPanel(entry: String, isLocked: Boolean, play: String => Unit) extends BoxPanel(Orientation.Horizontal) {
 
-  if (!isLocked && gameCell.isEmpty) contents += redChoice += blueChoice
+  if (!isLocked && entry != "E") contents += redChoice += blueChoice
   preferredSize = new Dimension(50, 50)
   background =
-    if (gameCell.isBlue) CellPanel.BLUE
-    else if (gameCell.isRed) CellPanel.RED
+    if (entry == "B") CellPanel.BLUE
+    else if (entry == "R") CellPanel.RED
     else if (isLocked) CellPanel.LOCKED
     else CellPanel.EMPTY
   border = Swing.BeveledBorder(Swing.Raised)
 
-  def redChoice: BoxPanel = choice(() => control.playRed(x + 1, y + 1), CellPanel.RED)
+  def redChoice: BoxPanel = choice(() => play("R"), CellPanel.RED)
 
-  def blueChoice: BoxPanel = choice(() => control.playBlue(x + 1, y + 1), CellPanel.BLUE)
+  def blueChoice: BoxPanel = choice(() => play("R"), CellPanel.BLUE)
 
   def choice(choose: () => Unit, choiceColor: Color): BoxPanel = new BoxPanel(Orientation.Horizontal) {
     preferredSize = new Dimension(20, 40)

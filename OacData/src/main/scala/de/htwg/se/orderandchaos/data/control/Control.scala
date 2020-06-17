@@ -62,7 +62,11 @@ class ControlImpl(sessionId: String,
     publish(new CellSet(sessionId))
   })
 
-  override def finish(winner: String): Controller = Controller.getFinished(currentController.grid, winner)
+  override def finish(winner: String): Controller = {
+    val gameOverController = Controller.getFinished(currentController.grid, winner)
+    currentController = gameOverController
+    gameOverController
+  }
 
   //noinspection DuplicatedCode
   override def undo(): Try[Unit] = {

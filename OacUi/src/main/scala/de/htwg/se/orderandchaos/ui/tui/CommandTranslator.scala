@@ -1,57 +1,52 @@
 package de.htwg.se.orderandchaos.ui.tui
 
-import de.htwg.se.orderandchaos.data.control.Control
-import de.htwg.se.orderandchaos.data.model.cell.Cell
-import de.htwg.se.orderandchaos.data.model.{CommandParsingException, InvalidCellTypeException}
-import de.htwg.se.orderandchaos.winconditionchecker.WinConditionChecker
+import de.htwg.se.orderandchaos.ui.GameController
+import de.htwg.se.orderandchaos.ui.util.{CommandParsingException, InvalidCellTypeException}
 
 import scala.io.AnsiColor.{BLUE, RED, RESET}
 import scala.util.{Failure, Success, Try}
 
-class CommandTranslator(control: Control) {
-  def makeColorString: String = {
-    control.makeString(colorCell(_) match {
-      case Success(coloredString) => coloredString
-      case Failure(e) => throw new IllegalStateException(e)
-    })
+class CommandTranslator(controller: GameController) {
+  private val width = 6
+
+  def colorCell(color: String): String = color match {
+    case "B" => s"${BLUE}B$RESET"
+    case "R" => s"${RED}R$RESET"
+    case "E" => "E"
+    case s => new IllegalArgumentException("Cell did not match known types").printStackTrace(); s
   }
 
-  def colorCell(cell: Cell): Try[String] = cell match {
-    case Cell.blue => Success(s"$BLUE${Cell.blue}$RESET")
-    case Cell.red => Success(s"$RED${Cell.red}$RESET")
-    case Cell.empty => Success(Cell.empty.toString)
-    case Cell(_) => Failure(new IllegalArgumentException("Cell did not match known types"))
-  }
-
-  def interpretSet(input: String): Try[Unit] = {
+  def interpretSet(input: String, id: String): Try[Unit] = {
     val values = input.split(" ")
-    if (values.length != 2) {
+    (if (values.length != 2) {
       Failure(new CommandParsingException("Both coordinates and the field type need to be set!"))
     } else {
-      buildCoordinates(values(0)).flatMap(coordinates => control.play(coordinates(0), coordinates(1), values(1)))
-    } match {
+      buildCoordinates(values(0)).map(coordinates => controller.play(id, coordinates(0), coordinates(1), values(1)))
+    }) match {
       case Failure(e: CommandParsingException) => Failure(new CommandParsingException(s"${e.getMessage} - Usage: ${CommandTranslator.setInstruction}"))
       case Failure(_: InvalidCellTypeException) => Failure(new CommandParsingException(
-        s"The field type was invalid! types: ${Cell.validSetTypes.mkString(", ")} - Usage: ${CommandTranslator.setInstruction}"))
-      case e: Failure[_] => e
+        s"The field type was invalid! types: B, R - Usage: ${CommandTranslator.setInstruction}"))
+      case Failure(e) => Failure(e)
       case Success(_) => Success()
     }
   }
 
   private def buildCoordinates(input: String): Try[Array[Int]] = {
     val values = input.split(",")
-    if (values.length != 2)
+    if (values.length != 2) {
       Failure(new CommandParsingException("X and Y value required to set a field!"))
-    else
+    } else {
       Try(values.map(_.toInt)) match {
         case Success(coordinates) =>
-          if (coordinates(0) > WinConditionChecker.WINNINGSTREAK + 1 || coordinates(0) < 1
-            || coordinates(1) > WinConditionChecker.WINNINGSTREAK + 1 || coordinates(0) < 1)
-            Failure(new CommandParsingException(s"The coordinates need to be between 1 and ${WinConditionChecker.WINNINGSTREAK + 1}"))
-          else
+          if (coordinates(0) > width || coordinates(0) < 1
+            || coordinates(1) > width || coordinates(0) < 1) {
+            Failure(new CommandParsingException(s"The coordinates need to be between 1 and $width"))
+          } else {
             Success(coordinates)
+          }
         case Failure(_) => Failure(new CommandParsingException("X and Y value need to be numbers"))
       }
+    }
 
   }
 }
