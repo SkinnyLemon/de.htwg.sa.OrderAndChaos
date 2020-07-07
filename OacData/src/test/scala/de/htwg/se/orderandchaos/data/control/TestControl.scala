@@ -60,9 +60,9 @@ class TestControl(controllerToUse: Controller = new TestController, cell: Cell =
     returnValue
   }
 
-  override def save(): Unit = saveCalls += 1
+  override def save(id: String): Unit = saveCalls += 1
 
-  override def load(): Unit = loadCalls += 1
+  override def load(id: String): Unit = loadCalls += 1
 
   override def controller: Controller = {
     controllerCalls += 1
@@ -91,9 +91,9 @@ class ErrorControl(exception: Exception) extends Control {
 
   override def reset(): Try[Unit] = Failure(exception)
 
-  override def save(): Unit = throw exception
+  override def save(id: String): Unit = throw exception
 
-  override def load(): Unit = throw exception
+  override def load(id: String): Unit = throw exception
 
   override def controller: Controller = throw exception
 

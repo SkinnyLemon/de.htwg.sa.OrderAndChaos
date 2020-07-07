@@ -56,7 +56,7 @@ class DataHttp extends WinChecker with GridUpdater {
     get {
       path("data" / "save") {
         entity(as[String]) { id =>
-          sessionHandler(id).save()
+          sessionHandler(id).save(id)
           complete("")
         }
       }
@@ -64,7 +64,7 @@ class DataHttp extends WinChecker with GridUpdater {
     get {
       path("data" / "load") {
         entity(as[String]) { id =>
-          sessionHandler(id).load()
+          sessionHandler(id).load(id)
           complete("")
         }
       }

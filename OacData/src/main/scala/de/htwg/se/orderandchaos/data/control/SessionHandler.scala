@@ -3,6 +3,7 @@ package de.htwg.se.orderandchaos.data.control
 import java.util.UUID
 
 import akka.actor.ActorSystem
+import de.htwg.se.orderandchaos.data.db.slick.SlickDb
 import de.htwg.se.orderandchaos.data.{GridUpdater, WinChecker}
 
 import scala.collection.mutable
@@ -13,7 +14,7 @@ import scala.util.{Failure, Success}
 class SessionHandler(winChecker: WinChecker, updater: GridUpdater) extends Reactor {
   implicit val system: ActorSystem = ActorSystem("my-system")
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-  private val factory = Control.getControlFactory
+  private val factory = Control.getControlFactory(SlickDb.getInstance)
   private val sessions = mutable.Map.empty[String, Control]
 
   def apply(id: String): Control = sessions(id)
@@ -48,6 +49,6 @@ class SessionHandler(winChecker: WinChecker, updater: GridUpdater) extends React
           case Success(i) => new IllegalArgumentException("WinChecker returned unknown number: " + i).printStackTrace()
           case Failure(e) => throw e
         }
-    case _ => throw new IllegalArgumentException("Wins should be determined by the SessionHandler")
+    case w: Win => updater.announceWin(w.sessionId, sessions(w.sessionId).controller, w.player)
   }
 }

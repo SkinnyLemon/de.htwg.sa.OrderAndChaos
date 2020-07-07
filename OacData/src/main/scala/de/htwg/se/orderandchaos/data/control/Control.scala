@@ -1,12 +1,14 @@
 package de.htwg.se.orderandchaos.data.control
 
-import com.google.inject.Inject
 import de.htwg.se.orderandchaos.data.control.controller.Controller
-import de.htwg.se.orderandchaos.data.control.file.FileManager
-import de.htwg.se.orderandchaos.data.control.file.json.JsonFileManager
+import de.htwg.se.orderandchaos.data.db.ControllerDao
+import de.htwg.se.orderandchaos.data.db.slick.SlickDb
 import de.htwg.se.orderandchaos.data.model.NoMoreMovesException
 import de.htwg.se.orderandchaos.data.model.cell.Cell
 
+import scala.concurrent.duration._
+
+import scala.concurrent.Await
 import scala.swing.Publisher
 import scala.util.{Failure, Success, Try}
 
@@ -23,9 +25,9 @@ trait Control extends Publisher {
 
   def reset(): Try[Unit]
 
-  def save(): Unit
+  def save(id: String): Unit
 
-  def load(): Unit
+  def load(id: String): Unit
 
   def controller: Controller
 
@@ -35,16 +37,16 @@ trait Control extends Publisher {
 }
 
 object Control {
-  def getControlFactory: ControlFactory = new ControlFactory
+  def getControlFactory(database: ControllerDao): ControlFactory = new ControlFactory(database)
 }
 
-class ControlFactory() {
-  def getNewControl(sessionId: String): Control = new ControlImpl(sessionId)
+class ControlFactory(database: ControllerDao) {
+  def getNewControl(sessionId: String): Control = new ControlImpl(sessionId, database = database)
 }
 
 class ControlImpl(sessionId: String,
                   startController: Controller = Controller.getNew,
-                  @Inject fileManager: FileManager = new JsonFileManager) extends Control {
+                  database: ControllerDao = SlickDb.getInstance) extends Control {
   private var currentController: Controller = startController
   private var pastMoves: Vector[Controller] = Vector.empty
   private var futureMoves: Vector[Controller] = Vector.empty
@@ -95,10 +97,10 @@ class ControlImpl(sessionId: String,
     Success()
   }
 
-  override def save(): Unit = fileManager.saveToFile(currentController)
+  override def save(id: String): Unit = database.create(id, controller)
 
-  override def load(): Unit = {
-    val controller = fileManager.loadFromFile
+  override def load(id: String): Unit = {
+    val controller = Await.result(database.read(id), 1000 millis)
     pastMoves = currentController +: pastMoves
     currentController = controller
     if (controller.isOngoing) publish(new CellSet(sessionId))
