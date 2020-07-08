@@ -2,13 +2,11 @@ package de.htwg.se.orderandchaos.data.control
 
 import de.htwg.se.orderandchaos.data.control.controller.Controller
 import de.htwg.se.orderandchaos.data.db.ControllerDao
-import de.htwg.se.orderandchaos.data.db.slick.SlickDb
 import de.htwg.se.orderandchaos.data.model.NoMoreMovesException
 import de.htwg.se.orderandchaos.data.model.cell.Cell
 
-import scala.concurrent.duration._
-
 import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.swing.Publisher
 import scala.util.{Failure, Success, Try}
 
@@ -46,7 +44,7 @@ class ControlFactory(database: ControllerDao) {
 
 class ControlImpl(sessionId: String,
                   startController: Controller = Controller.getNew,
-                  database: ControllerDao = SlickDb.getInstance) extends Control {
+                  database: ControllerDao = ControllerDao.getInstance) extends Control {
   private var currentController: Controller = startController
   private var pastMoves: Vector[Controller] = Vector.empty
   private var futureMoves: Vector[Controller] = Vector.empty

@@ -21,7 +21,8 @@ val commonDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
   "com.typesafe.slick" %% "slick" % "3.3.2",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
-  "com.h2database" % "h2" % "1.4.199"
+  "com.h2database" % "h2" % "1.4.199",
+  "org.mongodb.scala" %% "mongo-scala-driver" % "2.6.0"
 )
 
 lazy val global = project

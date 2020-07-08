@@ -23,6 +23,7 @@ class SlickDb extends ControllerDao {
   private val setupFuture = db.run(setup)
 
   def read(id: String): Future[Controller] = {
+    println(s"Reading $id from SlickDb")
     val cellFutures = Array.ofDim[Future[Cell]](Grid.WIDTH, Grid.WIDTH)
     for (x <- 0 until Grid.WIDTH; y <- 0 until Grid.WIDTH) {
       cellFutures(x)(y) = readCell(id, x, y)
@@ -53,6 +54,7 @@ class SlickDb extends ControllerDao {
   }
 
   override def create(id: String, controller: Controller): Unit = {
+    println(s"Writing $id to SlickDb")
     controller.grid
       .getRows.get
       .map(_.zipWithIndex)
@@ -69,17 +71,6 @@ class SlickDb extends ControllerDao {
 
   private def create(cell: Cell, controllerId: String, x: Int, y: Int): Unit = {
     db.run(SlickSchemas.cells += (0, controllerId, cell.cellType, x, y))
-  }
-
-  private def remove(id: String): Unit = {
-    val query = DBIO.seq(
-      SlickSchemas.cells.filter(cellObj => cellObj.controllerId === id).delete,
-      SlickSchemas.controllers.filter(controllerObj => controllerObj.id === id).delete
-    )
-    Await.result(
-      db.run(query),
-      1000 millis
-    )
   }
 }
 
