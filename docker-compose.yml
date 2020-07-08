@@ -11,6 +11,8 @@ services:
     container_name: "data"
     image: oac-data:latest
     stdin_open: true
+    ports:
+    - 8085:8085
     links:
       - winchecker
       - mongo

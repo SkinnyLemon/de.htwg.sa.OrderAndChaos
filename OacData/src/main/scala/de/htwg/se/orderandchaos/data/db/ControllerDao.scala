@@ -1,7 +1,7 @@
 package de.htwg.se.orderandchaos.data.db
 
 import de.htwg.se.orderandchaos.data.control.controller.Controller
-import de.htwg.se.orderandchaos.data.db.mongo.MongoDb
+import de.htwg.se.orderandchaos.data.db.slick.SlickDb
 
 import scala.concurrent.Future
 
@@ -12,5 +12,5 @@ trait ControllerDao {
 }
 
 object ControllerDao {
-  def getInstance: ControllerDao = MongoDb.getInstance
+  def getInstance: ControllerDao = SlickDb.getInstance
 }
